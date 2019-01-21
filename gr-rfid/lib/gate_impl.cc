@@ -25,30 +25,32 @@
 #include <gnuradio/io_signature.h>
 #include "gate_impl.h"
 #include <sys/time.h>
+#include <stdio.h>
 
-namespace gr {
-  namespace rfid {
-
+namespace gr
+{
+  namespace rfid
+  {
     gate::sptr
+
     gate::make(int sample_rate)
     {
-      return gnuradio::get_initial_sptr
-        (new gate_impl(sample_rate));
+      return gnuradio::get_initial_sptr(new gate_impl(sample_rate));
     }
-    /*
-     * The private constructor
-     */
-    gate_impl::gate_impl(int sample_rate)
-      : gr::block("gate",
-              gr::io_signature::make(1, 1, sizeof(gr_complex)),
-              gr::io_signature::make(1, 1, sizeof(gr_complex))),
-              n_samples(0), win_index(0), dc_index(0), num_pulses(0), signal_state(NEG_EDGE), avg_ampl(0), dc_est(0,0)
-    {
 
-       n_samples_T1       = T1_D       * (sample_rate / pow(10,6));
-       n_samples_PW       = PW_D       * (sample_rate / pow(10,6));
-        n_samples_TAG_BIT = TAG_BIT_D * (sample_rate / pow(10,6));
-      
+    /*
+    * The private constructor
+    */
+    gate_impl::gate_impl(int sample_rate)
+    : gr::block("gate",
+    gr::io_signature::make(1, 1, sizeof(gr_complex)),
+    gr::io_signature::make(1, 1, sizeof(gr_complex))),
+    n_samples(0), win_index(0), dc_index(0), num_pulses(0), signal_state(NEG_EDGE), avg_ampl(0), dc_est(0,0)
+    {
+      n_samples_T1       = T1_D       * (sample_rate / pow(10,6));
+      n_samples_PW       = PW_D       * (sample_rate / pow(10,6));
+      n_samples_TAG_BIT  = TAG_BIT_D  * (sample_rate / pow(10,6));
+
       win_length = WIN_SIZE_D * (sample_rate/ pow(10,6));
       dc_length  = DC_SIZE_D  * (sample_rate / pow(10,6));
 
@@ -169,35 +171,39 @@ namespace gr {
 
               reader_state->magn_squared_samples.resize(0);
 
-
               reader_state->magn_squared_samples.push_back(std::norm(in[i] - dc_est));
-              out[written] = in[i] - dc_est;  
+              //out[written] = gr_complex(std::abs((in[i] - dc_est).imag()), 0);
+              //out[written] = std::norm(in[i] - dc_est);
+              out[written] = std::abs(std::sqrt(std::norm(in[i])) - std::sqrt(std::norm(dc_est)));
               written++;
 
-              num_pulses = 0; 
+              num_pulses = 0;
               n_samples =  1; // Count number of samples passed to the next block
-
             }
-          }
+          } // if( !(reader_state->gate_status == GATE_OPEN) )
           else
           {
             n_samples++;
 
             reader_state->magn_squared_samples.push_back(std::norm(in[i] - dc_est));
-            out[written] = in[i] - dc_est; // Remove offset from complex samples           
+            //out[written] = in[i] - dc_est; // Remove offset from complex samples
+            //out[written] = std::norm(in[i] - dc_est);
+            //out[written] = gr_complex(std::abs((in[i] - dc_est).imag()), 0);
+            out[written] = std::abs(std::sqrt(std::norm(in[i])) - std::sqrt(std::norm(dc_est)));
+
             written++;
             if (n_samples >= reader_state->n_samples_to_ungate)
             {
-              reader_state->gate_status = GATE_CLOSED;    
+              reader_state->gate_status = GATE_CLOSED;
               number_samples_consumed = i+1;
               break;
             }
-          }
-        }
-      }
-      consume_each (number_samples_consumed);
-      return written;
-    }
+          } // else
+        } // for(int i = 0; i < n_items; i++)
+      } // if (reader_state->status == RUNNING)
+    consume_each (number_samples_consumed);
+    debug.close();
+    return written;
+    } // gate_impl::general_work
   } /* namespace rfid */
 } /* namespace gr */
-
