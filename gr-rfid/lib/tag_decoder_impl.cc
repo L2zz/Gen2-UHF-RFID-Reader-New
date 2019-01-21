@@ -197,7 +197,8 @@ namespace gr
       return max_max_index;
     }
 
-    int tag_decoder_impl::decode_single_bit(const gr_complex* in, int index, int mask_level, float* ret_corr)
+    int tag_decoder_impl::decode_single_bit(const gr_complex* in, int index,
+                                            int mask_level, int& shift, float* ret_corr)
     // index: start point of "tag data", do not decrease half bit!
     // mask_level: start level of "decoding bit", do not put start level of "previoud bit"! (-1)low start, (1)high start
     // corr: return max_corr
