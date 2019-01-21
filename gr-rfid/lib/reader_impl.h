@@ -39,6 +39,8 @@ namespace gr {
       void crc_append(std::vector<float> & q);
       void gen_query_bits();
       void gen_ack_bits(const float * in);
+      
+      int timestamp;
 
     public:
       void print_results();
