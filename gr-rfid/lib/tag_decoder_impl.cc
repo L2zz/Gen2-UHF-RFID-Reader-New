@@ -34,6 +34,7 @@
 #define DEBUG_MESSAGE_TAG_DECODER_DECODE_SINGLE_BIT 0
 #define DEBUG_MESSAGE_TAG_DECODER_TAG_DETECTION 0
 #define SHIFT_SIZE 3  // used in tag_detection
+#define PADDING_PORTION 0.3
 
 namespace gr
 {
@@ -166,13 +167,14 @@ namespace gr
     {
       float max_max_corr = 0.0f;
       int max_max_index = -1;
+      int shift = 0;
 
       std::ofstream debug(debug_file_path, std::ios::app);
 
       for(int k=0 ; k<2 ; k++)
       {
         float max_corr = 0.0f;
-        int max_index = decode_single_bit(in, index, k, &max_corr);
+        int max_index = decode_single_bit(in, index, k, shift, &max_corr);
 
         if(max_corr > max_max_corr)
         {
@@ -217,9 +219,10 @@ namespace gr
 
       float max_corr = 0.0f;
       int max_index = -1;
+      int num_of_samples_padd = n_samples_TAG_BIT*PADDING_PORTION;
 
-      clock_t begin, end;
-      begin = clock();
+      clock_t start, end;
+      start = clock();
 
       for(int i=0 ; i<2 ; i++)
       {
@@ -228,26 +231,36 @@ namespace gr
           average_amp += in[index+j].real();
         average_amp /= (2*n_samples_TAG_BIT);
 
-        float corr = 0.0f;
-        for(int j=-(n_samples_TAG_BIT*0.5) ; j<(n_samples_TAG_BIT*1.5) ; j++)
-        {
-          int idx;
-          if(j < 0) idx = 0;
-          else if(j < (n_samples_TAG_BIT*0.5)) idx = 1;
-          else if(j < n_samples_TAG_BIT) idx = 2;
-          else idx = 3;
+        for (int j = 0; j < 4; j++) {
+          float begin, end;
+          float corr = 0.0f;
 
-          corr += masks[mask_level][i][idx] * (in[index+j].real() - average_amp);
-        }
-
-        if(corr > max_corr)
-        {
-          max_corr = corr;
-          max_index = i;
+          int begin_idx = index + shift + (j-1)*(n_samples_TAG_BIT/2) + num_of_samples_padd;
+          int end_idx = index + shift + j*n_samples_TAG_BIT/2 - num_of_samples_padd;
+          while (1) {
+            begin = in[begin_idx].real();
+            begin -= average_amp;
+            end = in[end_idx].real();
+            end -= average_amp;
+            if (begin * end > 0) break;
+            float mid = in[(begin_idx + end_idx)/2].real();
+            mid -= average_amp;
+            if (begin * mid < 0) {
+              shift += num_of_samples_padd;
+              j = 0;
+            } else {
+              shift -= num_of_samples_padd;
+              j = 0;
+            }
+          }
+          begin /= abs(begin);
+          end /= abs(end);
+          corr += masks[mask_level][i][j] * begin;
+          corr += masks[mask_level][i][j] * begin;
         }
       }
       end = clock();
-      exe_time << ((double)(end-begin)/CLOCKS_PER_SEC) << std::endl;
+      exe_time << ((double)(end-start)/CLOCKS_PER_SEC) << std::endl;
       exe_time.close();
 
       if(DEBUG_MESSAGE_TAG_DECODER_DECODE_SINGLE_BIT) std::cout << "\t\t\t[decode_single_bit] max_corr=" << max_corr << ", decoded bit=" << max_index;
@@ -263,7 +276,6 @@ namespace gr
         if(DEBUG_MESSAGE_TAG_DECODER_DECODE_SINGLE_BIT) std::cout << " (low start)" << std::endl;
         //debug << " (low start)" << std::endl;
       }
-
       debug.close();
       (*ret_corr) = max_corr;
       return max_index;
@@ -282,27 +294,8 @@ namespace gr
       int shift = 0;
       for(int i=0 ; i<n_expected_bit ; i++)
       {
-        int idx = index + i*n_samples_TAG_BIT + shift;
-        float max_corr = 0.0f;
-        int max_index;
-        int curr_shift;
-
-        for(int j=0 ; j<(SHIFT_SIZE*2 + 1) ; j++)
-        {
-          float corr = 0.0f;
-          int index = decode_single_bit(in, idx+j-SHIFT_SIZE, mask_level, &corr);
-
-          if(corr > max_corr)
-          {
-            max_corr = corr;
-            max_index = index;
-            curr_shift = j - SHIFT_SIZE;
-          }
-        }
-
-        if(DEBUG_MESSAGE_TAG_DECODER_TAG_DETECTION)
-          std::cout << "\t\t[tag_detection " << i+1 << "th bit] max_corr=" << max_corr << ", curr_shift=" << curr_shift << ", shift=" << shift << ", decoded_bit=" << max_index;
-        debug << "\t\t[tag_detection " << i+1 << "th bit] max_corr=" << max_corr << ", curr_shift=" << curr_shift << ", shift=" << shift << ", decoded_bit=" << max_index;
+        int idx = index + i*n_samples_TAG_BIT;
+        int decoded_bit = decode_single_bit(in, idx, mask_level, shift, corr);
 
         if(mask_level)
         {
@@ -315,22 +308,12 @@ namespace gr
           debug << " (low start)" << std::endl;
         }
 
-        if(max_index) mask_level *= -1; // change mask_level when the decoded bit is 1
-
-        if(DEBUG_MESSAGE_TAG_DECODER_TAG_DETECTION) std::cout << "\t\t\t[tag_detection] ";
-        debug << "\t\t\t[tag_detection] ";
-
-        for(int j=idx-SHIFT_SIZE ; j<idx+n_samples_TAG_BIT+SHIFT_SIZE ; j++)
-        {
-          if(DEBUG_MESSAGE_TAG_DECODER_TAG_DETECTION) std::cout << in[j].real() << " ";
-          debug << in[j].real() << " ";
-        }
+        if(decoded_bit) mask_level *= -1; // change mask_level when the decoded bit is 1
 
         if(DEBUG_MESSAGE_TAG_DECODER_TAG_DETECTION) std::cout << std::endl << std::endl;
         debug << std::endl << std::endl;
 
-        decoded_bits.push_back(max_index);
-        shift += curr_shift;
+        decoded_bits.push_back(decoded_bit);
       }
 
       if(DEBUG_MESSAGE_TAG_DECODER) std::cout << "\t[tag_detection] decoded_bits=\t";
