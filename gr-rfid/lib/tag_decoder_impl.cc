@@ -103,7 +103,7 @@ namespace gr
         // calculate average_amp (threshold)
         float average_amp = 0.0f;
         for(int j=0 ; j<win_size ; j++)
-          average_amp += in[i].real();
+          average_amp += in[i+j].real();
         average_amp /= win_size;
 
         // calculate correlation value
