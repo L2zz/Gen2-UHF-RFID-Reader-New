@@ -1,22 +1,22 @@
 /* -*- c++ -*- */
-/* 
- * Copyright 2015 <Nikos Kargas (nkargas@isc.tuc.gr)>.
- * 
- * This is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3, or (at your option)
- * any later version.
- * 
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.  If not, write to
- * the Free Software Foundation, Inc., 51 Franklin Street,
- * Boston, MA 02110-1301, USA.
- */
+/*
+* Copyright 2015 <Nikos Kargas (nkargas@isc.tuc.gr)>.
+*
+* This is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation; either version 3, or (at your option)
+* any later version.
+*
+* This software is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this software; see the file COPYING.  If not, write to
+* the Free Software Foundation, Inc., 51 Franklin Street,
+* Boston, MA 02110-1301, USA.
+*/
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -65,15 +65,15 @@ namespace gr
       GR_LOG_INFO(d_logger, "Size of window for dc offset estimation : " << dc_length);
       GR_LOG_INFO(d_logger, "Duration of window for dc offset estimation : " << DC_SIZE_D << " us");
 
-      
+
       // First block to be scheduled
       GR_LOG_INFO(d_logger, "Initializing reader state...");
       initialize_reader_state();
-    } 
+    }
 
     /*
-     * Our virtual destructor.
-     */
+    * Our virtual destructor.
+    */
     gate_impl::~gate_impl()
     {
     }
@@ -81,16 +81,15 @@ namespace gr
     void
     gate_impl::forecast (int noutput_items, gr_vector_int &ninput_items_required)
     {
-        ninput_items_required[0] = noutput_items;
+      ninput_items_required[0] = noutput_items;
     }
 
     int
     gate_impl::general_work (int noutput_items,
-                       gr_vector_int &ninput_items,
-                       gr_vector_const_void_star &input_items,
-                       gr_vector_void_star &output_items)
+      gr_vector_int &ninput_items,
+      gr_vector_const_void_star &input_items,
+      gr_vector_void_star &output_items)
     {
-
       const gr_complex *in = (const gr_complex *) input_items[0];
       gr_complex *out = (gr_complex *) output_items[0];
 
@@ -99,51 +98,54 @@ namespace gr
       float sample_ampl = 0;
       int written = 0;
 
-      
+      std::ofstream debug(debug_file_path, std::ios::app);
+      //std::cout << "PW samples : " << n_samples_PW << std::endl;
+
       if( (reader_state-> reader_stats.n_queries_sent   > MAX_NUM_QUERIES ||
-           reader_state-> reader_stats.tag_reads.size() > NUMBER_UNIQUE_TAGS) &&  
-           reader_state-> status != TERMINATED)
+        reader_state-> reader_stats.tag_reads.size() > NUMBER_UNIQUE_TAGS) &&
+        reader_state-> status != TERMINATED)
       {
         reader_state-> status = TERMINATED;
         gettimeofday (&reader_state-> reader_stats.end, NULL);
         std::cout << "| Execution time : " << reader_state-> reader_stats.end.tv_sec - reader_state-> reader_stats.start.tv_sec << " seconds" << std::endl;
+        debug << "| Execution time : " << reader_state-> reader_stats.end.tv_sec - reader_state-> reader_stats.start.tv_sec << " seconds" << std::endl;
         GR_LOG_INFO(d_logger, "Termination");
-       }
+      }
 
-      // Gate block is controlled by the Gen2 Logic block
+        // Gate block is controlled by the Gen2 Logic block
       if(reader_state->gate_status == GATE_SEEK_EPC)
       {
         reader_state->gate_status = GATE_CLOSED;
-        reader_state->n_samples_to_ungate = (EPC_BITS + TAG_PREAMBLE_BITS) * n_samples_TAG_BIT + 2*n_samples_TAG_BIT;
+        reader_state->n_samples_to_ungate = (EPC_BITS + TAG_PREAMBLE_BITS) * n_samples_TAG_BIT + 8*n_samples_TAG_BIT;
         n_samples = 0;
       }
       else if (reader_state->gate_status == GATE_SEEK_RN16)
       {
         reader_state->gate_status = GATE_CLOSED;
-        reader_state->n_samples_to_ungate = (RN16_BITS + TAG_PREAMBLE_BITS) * n_samples_TAG_BIT + 2*n_samples_TAG_BIT;
+        reader_state->n_samples_to_ungate = (RN16_BITS + TAG_PREAMBLE_BITS) * n_samples_TAG_BIT + 8*n_samples_TAG_BIT;
         n_samples = 0;
       }
-      
+
       if (reader_state->status == RUNNING)
       {
         for(int i = 0; i < n_items; i++)
         {
           // Tracking average amplitude
           sample_ampl = std::abs(in[i]);
-          avg_ampl = avg_ampl + (sample_ampl - win_samples[win_index])/win_length;  
-          win_samples[win_index] = sample_ampl; 
+          avg_ampl = avg_ampl + (sample_ampl - win_samples[win_index])/win_length;
+          win_samples[win_index] = sample_ampl;
           win_index = (win_index + 1) % win_length;
-  
+
           //Threshold for detecting negative/positive edges
-          sample_thresh = avg_ampl * THRESH_FRACTION;  
+          sample_thresh = avg_ampl * THRESH_FRACTION;
 
           if( !(reader_state->gate_status == GATE_OPEN) )
           {
             //Tracking DC offset (only during T1)
-            dc_est =  dc_est + (in[i] - dc_samples[dc_index])/std::complex<float>(dc_length,0);  
-            dc_samples[dc_index] = in[i]; 
+            dc_est =  dc_est + (in[i] - dc_samples[dc_index])/std::complex<float>(dc_length,0);
+            dc_samples[dc_index] = in[i];
             dc_index = (dc_index + 1) % dc_length;
-          
+
             n_samples++;
 
             // Potitive edge -> Negative edge
@@ -152,14 +154,14 @@ namespace gr
               n_samples = 0;
               signal_state = NEG_EDGE;
             }
-            // Negative edge -> Positive edge 
+            // Negative edge -> Positive edge
             else if (sample_ampl > sample_thresh && signal_state == NEG_EDGE)
             {
               signal_state = POS_EDGE;
               if (n_samples > n_samples_PW/2)
-                num_pulses++; 
+                num_pulses++;
               else
-                num_pulses = 0; 
+                num_pulses = 0;
               n_samples = 0;
             }
 
@@ -202,6 +204,7 @@ namespace gr
         } // for(int i = 0; i < n_items; i++)
       } // if (reader_state->status == RUNNING)
     consume_each (number_samples_consumed);
+    debug.close();
     return written;
     } // gate_impl::general_work
   } /* namespace rfid */

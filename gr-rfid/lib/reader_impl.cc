@@ -1,22 +1,22 @@
 /* -*- c++ -*- */
-/* 
- * Copyright 2015 <Nikos Kargas (nkargas@isc.tuc.gr)>.
- * 
- * This is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3, or (at your option)
- * any later version.
- * 
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.  If not, write to
- * the Free Software Foundation, Inc., 51 Franklin Street,
- * Boston, MA 02110-1301, USA.
- */
+/*
+* Copyright 2015 <Nikos Kargas (nkargas@isc.tuc.gr)>.
+*
+* This is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation; either version 3, or (at your option)
+* any later version.
+*
+* This software is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this software; see the file COPYING.  If not, write to
+* the Free Software Foundation, Inc., 51 Franklin Street,
+* Boston, MA 02110-1301, USA.
+*/
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -27,31 +27,30 @@
 #include "rfid/global_vars.h"
 #include <sys/time.h>
 
-namespace gr {
-  namespace rfid {
-
+namespace gr
+{
+  namespace rfid
+  {
     reader::sptr
     reader::make(int sample_rate, int dac_rate)
     {
       return gnuradio::get_initial_sptr
-        (new reader_impl(sample_rate,dac_rate));
+      (new reader_impl(sample_rate,dac_rate));
     }
 
     /*
-     * The private constructor
-     */
+    * The private constructor
+    */
     reader_impl::reader_impl(int sample_rate, int dac_rate)
-      : gr::block("reader",
-              gr::io_signature::make( 1, 1, sizeof(float)),
-              gr::io_signature::make( 1, 1, sizeof(float)))
+    : gr::block("reader",
+      gr::io_signature::make( 1, 1, sizeof(float)),
+      gr::io_signature::make( 1, 1, sizeof(float)))
     {
-
       GR_LOG_INFO(d_logger, "Block initialized");
 
       sample_d = 1.0/dac_rate * pow(10,6);
 
       // Number of samples for transmitting
-
       n_data0_s = 2 * PW_D / sample_d;
       n_data1_s = 4 * PW_D / sample_d;
       n_pw_s    = PW_D    / sample_d;
@@ -68,7 +67,7 @@ namespace gr {
       // CW waveforms of different sizes
       n_cwquery_s   = (T1_D+T2_D+RN16_D)/sample_d;     //RN16
       n_cwack_s     = (3*T1_D+T2_D+EPC_D)/sample_d;    //EPC   if it is longer than nominal it wont cause tags to change inventoried flag
-      n_p_down_s     = (P_DOWN_D)/sample_d;  
+      n_p_down_s     = (P_DOWN_D)/sample_d;
 
       p_down.resize(n_p_down_s);        // Power down samples
       cw_query.resize(n_cwquery_s);      // Sent after query/query rep
@@ -105,7 +104,7 @@ namespace gr {
       frame_sync.insert( frame_sync.end(), delim.begin() , delim.end() );
       frame_sync.insert( frame_sync.end(), data_0.begin(), data_0.end() );
       frame_sync.insert( frame_sync.end(), rtcal.begin() , rtcal.end() );
-      
+
       // create query rep
       query_rep.insert( query_rep.end(), frame_sync.begin(), frame_sync.end());
       query_rep.insert( query_rep.end(), data_0.begin(), data_0.end() );
@@ -135,17 +134,17 @@ namespace gr {
 
       query_bits.resize(0);
       query_bits.insert(query_bits.end(), &QUERY_CODE[0], &QUERY_CODE[4]);
+
       query_bits.push_back(DR);
       query_bits.insert(query_bits.end(), &M[0], &M[2]);
       query_bits.push_back(TREXT);
       query_bits.insert(query_bits.end(), &SEL[0], &SEL[2]);
       query_bits.insert(query_bits.end(), &SESSION[0], &SESSION[2]);
       query_bits.push_back(TARGET);
-    
+
       query_bits.insert(query_bits.end(), &Q_VALUE[FIXED_Q][0], &Q_VALUE[FIXED_Q][4]);
       crc_append(query_bits);
     }
-
 
     void reader_impl::gen_ack_bits(const float * in)
     {
@@ -153,7 +152,7 @@ namespace gr {
       ack_bits.insert(ack_bits.end(), &ACK_CODE[0], &ACK_CODE[2]);
       ack_bits.insert(ack_bits.end(), &in[0], &in[16]);
     }
-  
+
     void reader_impl::gen_query_adjust_bits()
     {
       query_adjust_bits.resize(0);
@@ -162,10 +161,9 @@ namespace gr {
       query_adjust_bits.insert(query_adjust_bits.end(), &Q_UPDN[1][0], &Q_UPDN[1][3]);
     }
 
-
     /*
-     * Our virtual destructor.
-     */
+    * Our virtual destructor.
+    */
     reader_impl::~reader_impl()
     {
 
@@ -456,8 +454,7 @@ namespace gr {
         memcpy(crc, tmp, 5*sizeof(float));
       }
       for (int i = 4; i >= 0; i--)
-        q.push_back(crc[i]);
+      q.push_back(crc[i]);
     }
   } /* namespace rfid */
 } /* namespace gr */
-
