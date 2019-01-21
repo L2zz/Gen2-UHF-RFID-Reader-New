@@ -208,11 +208,15 @@ namespace gr
       };
 
       std::ofstream debug(debug_file_path2, std::ios::app);
+      std::ofstream exe_time("time_dir/time");
 
       if(mask_level == -1) mask_level = 0;  // convert for indexing
 
       float max_corr = 0.0f;
       int max_index = -1;
+
+      clock_t begin, end;
+      begin = clock();
 
       for(int i=0 ; i<2 ; i++)
       {
@@ -239,6 +243,9 @@ namespace gr
           max_index = i;
         }
       }
+      end = clock();
+      exe_time << ((double)(end-begin)/CLOCKS_PER_SEC) << std::endl;
+      exe_time.close();
 
       if(DEBUG_MESSAGE_TAG_DECODER_DECODE_SINGLE_BIT) std::cout << "\t\t\t[decode_single_bit] max_corr=" << max_corr << ", decoded bit=" << max_index;
       //debug << "\t\t\t[decode_single_bit] max_corr=" << max_corr << ", decoded bit=" << max_index;
@@ -264,13 +271,10 @@ namespace gr
       std::vector<float> decoded_bits;
 
       std::ofstream debug(debug_file_path, std::ios::app);
-      std::ofstream exe_time("time_dir/time");
 
       if(DEBUG_MESSAGE_TAG_DECODER) std::cout << "\t[tag_decoder::tag_detection] Decoding " << n_expected_bit << " bit(s) of tag data.." << std::endl;
       debug << "\t[tag_decoder::tag_detection] Decoding " << n_expected_bit << " bit(s) of tag data.." << std::endl;
 
-      clock_t begin, end;
-      begin = clock();
       int mask_level = determine_first_mask_level(in, index);
       int shift = 0;
       for(int i=0 ; i<n_expected_bit ; i++)
@@ -325,8 +329,6 @@ namespace gr
         decoded_bits.push_back(max_index);
         shift += curr_shift;
       }
-      end = clock();
-      exe_time << ((double)(end-begin)/CLOCKS_PER_SEC) << std::endl;
 
       if(DEBUG_MESSAGE_TAG_DECODER) std::cout << "\t[tag_detection] decoded_bits=\t";
       debug << "\t[tag_detection] decoded_bits=\t";
@@ -352,7 +354,6 @@ namespace gr
       debug << std::endl;
 
       debug.close();
-      exe_time.close();
       return decoded_bits;
     }
 
