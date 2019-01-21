@@ -112,8 +112,10 @@ namespace gr
         {
           for(int k=0 ; k<(n_samples_TAG_BIT/2.0) ; k++)
           {
+            float normalized_amp = in[i+j*n_samples_TAG_BIT/2 + k].real() - average_amp;
+            normalized_amp /= abs(normalized_amp);
             for(int m=0 ; m<2 ; m++)  // m: index of TAG_PREAMBLE type
-                corr_candidates[m] += TAG_PREAMBLE[m][j] * (in[i + j*(int)(n_samples_TAG_BIT/2.0) + k].real() - average_amp);
+                corr_candidates[m] += TAG_PREAMBLE[m][j] * normalized_amp;
           }
         }
 
