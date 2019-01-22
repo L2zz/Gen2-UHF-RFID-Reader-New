@@ -274,6 +274,7 @@ namespace gr
       debug << "\t[tag_decoder::tag_detection] Decoding " << n_expected_bit << " bit(s) of tag data.." << std::endl;
 
       int mask_level = determine_first_mask_level(in, index);
+      std::cout << mask_level << std::endl;
       int shift = 0;
       for(int i=0 ; i<n_expected_bit ; i++)
       {
