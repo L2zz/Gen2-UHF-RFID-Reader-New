@@ -34,7 +34,7 @@
 #define DEBUG_MESSAGE_TAG_DECODER_DECODE_SINGLE_BIT 0
 #define DEBUG_MESSAGE_TAG_DECODER_TAG_DETECTION 0
 #define SHIFT_SIZE 3  // used in tag_detection
-#define PADDING_PORTION 0.3
+#define PADDING_PORTION 0.2
 
 namespace gr
 {
@@ -88,7 +88,7 @@ namespace gr
       // Threshold is an experimental value, so you might change this value within your environment.
 
       int win_size = n_samples_TAG_BIT * TAG_PREAMBLE_BITS;
-      float threshold = 0.1f;  // threshold verifing correlation value
+      float threshold = win_size * 0.9;  // threshold verifing correlation value
 
       float max_corr = 0.0f;
       int max_index = 0;
@@ -205,7 +205,7 @@ namespace gr
 
       float max_corr = 0.0f;
       int max_index = -1;
-      int num_of_samples_padd = n_samples_TAG_BIT*PADDING_PORTION;
+      int num_of_samples_padd = (n_samples_TAG_BIT/2)*PADDING_PORTION;
 
       clock_t start, end;
       start = clock();
@@ -229,14 +229,16 @@ namespace gr
             end -= average_amp;
             if (begin * end > 0) break;
             float mid = in[(begin_idx + end_idx)/2].real();
-            std::cout << "SHIFT" << std::endl;
             mid -= average_amp;
+            std::cout << "SHIFT: "<< j << " " << begin << " " << mid << " " << end << std::endl;
             if (begin * mid < 0) {
-              shift += num_of_samples_padd;
+              shift += num_of_samples_padd/2;
               j = 0;
+              corr = 0;
             } else {
-              shift -= num_of_samples_padd;
+              shift -= num_of_samples_padd/2;
               j = 0;
+              corr = 0;
             }
           }
           begin /= abs(begin);
@@ -250,8 +252,9 @@ namespace gr
           max_index = i;
           max_corr = corr;
         }
-        std::cout << std::endl << std::endl;
       }
+      std::cout << max_index << " : " << max_corr << std::endl;
+      std::cout << std::endl << std::endl;
       end = clock();
       exe_time << ((double)(end-start)/CLOCKS_PER_SEC) << std::endl;
       exe_time.close();
