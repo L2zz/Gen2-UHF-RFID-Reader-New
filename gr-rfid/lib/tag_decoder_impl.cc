@@ -220,16 +220,16 @@ namespace gr
 
         for (int j = 0; j < 4; j++) {
           float begin, end;
-
-          int begin_idx = index + shift + (j-1)*(int)(n_samples_TAG_BIT/2) + num_of_samples_padd;
-          int end_idx = index + shift + j*(int)(n_samples_TAG_BIT/2) - num_of_samples_padd;
           while (1) {
+            int begin_idx = index + shift + (j-1)*(int)(n_samples_TAG_BIT/2) + num_of_samples_padd;
+            int end_idx = index + shift + j*(int)(n_samples_TAG_BIT/2) - num_of_samples_padd;
             begin = in[begin_idx].real();
             begin -= average_amp;
             end = in[end_idx].real();
             end -= average_amp;
             if (begin * end > 0) break;
             float mid = in[(begin_idx + end_idx)/2].real();
+            std::cout << "SHIFT" << std::endl;
             mid -= average_amp;
             if (begin * mid < 0) {
               shift += num_of_samples_padd;
