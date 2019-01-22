@@ -243,6 +243,7 @@ namespace gr
           end /= abs(end);
           corr += masks[mask_level][i][j] * begin;
           corr += masks[mask_level][i][j] * end;
+          std::cout << corr << " ";
         }
         if (corr > max_corr) {
           max_index = i;
