@@ -250,7 +250,7 @@ namespace gr
           max_index = i;
           max_corr = corr;
         }
-        std::cout << std::endl;
+        std::cout << std::endl << std::endl;
       }
       end = clock();
       exe_time << ((double)(end-start)/CLOCKS_PER_SEC) << std::endl;
