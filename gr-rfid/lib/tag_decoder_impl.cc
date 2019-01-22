@@ -245,7 +245,6 @@ namespace gr
           last /= abs(last);
           corr += masks[mask_level][i][j] * begin;
           corr += masks[mask_level][i][j] * last;
-          corr = abs(corr);
           std::cout << corr << " ";
         }
         std::cout << std::endl;
