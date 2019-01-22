@@ -245,10 +245,12 @@ namespace gr
           corr += masks[mask_level][i][j] * end;
           std::cout << corr << " ";
         }
+        std::cout << std::endl;
         if (corr > max_corr) {
           max_index = i;
           max_corr = corr;
         }
+        std::cout << std::endl;
       }
       end = clock();
       exe_time << ((double)(end-start)/CLOCKS_PER_SEC) << std::endl;
