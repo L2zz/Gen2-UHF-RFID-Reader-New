@@ -133,8 +133,11 @@ namespace gr
         }
       }
 
-      if(DEBUG_MESSAGE_TAG_DECODER) std::cout << "\t\t[tag_sync] max_corr= " << max_corr << "\tmax_index= " << max_index << std::endl;
-      debug << "\t\t[tag_sync] max_corr= " << max_corr << "\tmax_index= " << max_index << std::endl;
+      if(DEBUG_MESSAGE_TAG_DECODER) std::cout << "\t\t[tag_sync] window_size= " << win_size \
+                                              << " max_corr= " << max_corr << "max_index= " \
+                                              << max_index << std::endl;
+      debug << "\t\t[tag_sync] window_size= " << win_size \
+            << "max_corr = " << max_corr << "max_index= " << max_index << std::endl;
 
       // check if correlation value exceeds threshold
       if(max_corr > threshold)
