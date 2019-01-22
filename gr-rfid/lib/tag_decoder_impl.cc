@@ -34,7 +34,7 @@
 #define DEBUG_MESSAGE_TAG_DECODER_DECODE_SINGLE_BIT 0
 #define DEBUG_MESSAGE_TAG_DECODER_TAG_DETECTION 0
 #define SHIFT_SIZE 3  // used in tag_detection
-#define PADDING_PORTION 0.2
+#define PADDING_PORTION 0.3
 
 namespace gr
 {
@@ -225,12 +225,12 @@ namespace gr
             int last_idx = index + shift + j*(int)(n_samples_TAG_BIT/2) - num_of_samples_padd;
             begin = in[begin_idx].real();
             begin -= average_amp;
-            last = in[end_idx].real();
+            last = in[last_idx].real();
             last -= average_amp;
             if (begin * last > 0) break;
             float mid = in[(begin_idx + last_idx)/2].real();
             mid -= average_amp;
-            std::cout << "SHIFT: "<< j << " " << begin << " " << mid << " " << last << std::endl;
+            std::cout << "SHIFT: " << shift << " " << begin << " " << mid << " " << last << std::endl;
             if (begin * mid < 0) {
               shift += num_of_samples_padd/2;
               j = 0;
@@ -245,6 +245,7 @@ namespace gr
           last /= abs(last);
           corr += masks[mask_level][i][j] * begin;
           corr += masks[mask_level][i][j] * last;
+          corr = abs(corr);
           std::cout << corr << " ";
         }
         std::cout << std::endl;
@@ -278,6 +279,7 @@ namespace gr
       {
         float corr = 0.0;
         int idx = index + i*n_samples_TAG_BIT;
+        std::cout << i+1 << "th bit" << std::endl;
         int decoded_bit = decode_single_bit(in, idx, mask_level, shift, &corr);
 
         if(decoded_bit) mask_level *= -1; // change mask_level when the decoded bit is 1
