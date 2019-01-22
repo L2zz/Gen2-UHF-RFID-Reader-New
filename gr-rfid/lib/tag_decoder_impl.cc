@@ -124,6 +124,7 @@ namespace gr
         float corr = 0.0f;
         for(int j=0 ; j<2 ; j++)
           if(corr_candidates[j] > corr) corr = corr_candidates[j];
+        std::cout << corr << std::endl;
 
         // compare with current max correlation value
         if(corr > max_corr)
@@ -232,11 +233,11 @@ namespace gr
             mid -= average_amp;
             std::cout << "SHIFT: " << shift << " " << begin << " " << mid << " " << last << std::endl;
             if (begin * mid < 0) {
-              shift += num_of_samples_padd/2;
+              shift += 1;
               j = 0;
               corr = 0;
             } else {
-              shift -= num_of_samples_padd/2;
+              shift -= 1;
               j = 0;
               corr = 0;
             }
