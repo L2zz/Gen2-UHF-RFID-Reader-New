@@ -113,7 +113,7 @@ namespace gr
         {
           for(int k=0 ; k<(n_samples_TAG_BIT/2.0) ; k++)
           {
-            float normalized_amp = in[i+j*n_samples_TAG_BIT/2 + k].real() - average_amp;
+            float normalized_amp = in[i + j*(int)(n_samples_TAG_BIT/2) + k].real() - average_amp;
             normalized_amp /= abs(normalized_amp);
             for(int m=0 ; m<2 ; m++)  // m: index of TAG_PREAMBLE type
                 corr_candidates[m] += TAG_PREAMBLE[m][j] * normalized_amp;
@@ -235,8 +235,8 @@ namespace gr
           float begin, end;
           float corr = 0.0f;
 
-          int begin_idx = index + shift + (j-1)*(n_samples_TAG_BIT/2) + num_of_samples_padd;
-          int end_idx = index + shift + j*n_samples_TAG_BIT/2 - num_of_samples_padd;
+          int begin_idx = index + shift + (j-1)*(int)(n_samples_TAG_BIT/2) + num_of_samples_padd;
+          int end_idx = index + shift + j*(int)(n_samples_TAG_BIT/2) - num_of_samples_padd;
           while (1) {
             begin = in[begin_idx].real();
             begin -= average_amp;
