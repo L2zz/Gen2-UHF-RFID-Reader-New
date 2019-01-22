@@ -88,7 +88,7 @@ namespace gr
       // Threshold is an experimental value, so you might change this value within your environment.
 
       int win_size = n_samples_TAG_BIT * TAG_PREAMBLE_BITS;
-      float threshold = win_size * 0.9;  // threshold verifing correlation value
+      float threshold = win_size * 0.7;  // threshold verifing correlation value
 
       float max_corr = 0.0f;
       int max_index = 0;
@@ -124,7 +124,7 @@ namespace gr
         float corr = 0.0f;
         for(int j=0 ; j<2 ; j++)
           if(corr_candidates[j] > corr) corr = corr_candidates[j];
-
+        std::cout << i << " : " << corr << std::endl;
         // compare with current max correlation value
         if(corr > max_corr)
         {
