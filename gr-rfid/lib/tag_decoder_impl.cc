@@ -124,7 +124,6 @@ namespace gr
         float corr = 0.0f;
         for(int j=0 ; j<2 ; j++)
           if(corr_candidates[j] > corr) corr = corr_candidates[j];
-        std::cout << corr << std::endl;
 
         // compare with current max correlation value
         if(corr > max_corr)
