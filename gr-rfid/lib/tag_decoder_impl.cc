@@ -137,7 +137,7 @@ namespace gr
                                               << " max_corr= " << max_corr << "max_index= " \
                                               << max_index << std::endl;
       debug << "\t\t[tag_sync] window_size= " << win_size \
-            << "max_corr = " << max_corr << "max_index= " << max_index << std::endl;
+            << " max_corr = " << max_corr << " max_index= " << max_index << std::endl;
 
       // check if correlation value exceeds threshold
       if(max_corr > threshold)
@@ -278,6 +278,7 @@ namespace gr
 
         decoded_bits.push_back(decoded_bit);
       }
+      std::cout << std::endl;
 
       if(DEBUG_MESSAGE_TAG_DECODER) std::cout << "\t[tag_detection] decoded_bits=\t";
       debug << "\t[tag_detection] decoded_bits=\t";
