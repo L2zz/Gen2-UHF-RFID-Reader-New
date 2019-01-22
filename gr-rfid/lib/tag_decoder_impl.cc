@@ -134,7 +134,7 @@ namespace gr
       }
 
       if(DEBUG_MESSAGE_TAG_DECODER) std::cout << "\t\t[tag_sync] window_size= " << win_size \
-                                              << " max_corr= " << max_corr << "max_index= " \
+                                              << " max_corr= " << max_corr << " max_index= " \
                                               << max_index << std::endl;
       debug << "\t\t[tag_sync] window_size= " << win_size \
             << " max_corr = " << max_corr << " max_index= " << max_index << std::endl;
