@@ -242,7 +242,7 @@ namespace gr
           begin /= abs(begin);
           end /= abs(end);
           corr += masks[mask_level][i][j] * begin;
-          corr += masks[mask_level][i][j] * begin;
+          corr += masks[mask_level][i][j] * end;
         }
         if (corr > max_corr) {
           max_index = i;
