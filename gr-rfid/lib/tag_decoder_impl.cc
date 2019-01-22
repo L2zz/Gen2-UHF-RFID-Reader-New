@@ -219,18 +219,18 @@ namespace gr
         average_amp /= (2*n_samples_TAG_BIT);
 
         for (int j = 0; j < 4; j++) {
-          float begin, end;
+          float begin, last;
           while (1) {
             int begin_idx = index + shift + (j-1)*(int)(n_samples_TAG_BIT/2) + num_of_samples_padd;
-            int end_idx = index + shift + j*(int)(n_samples_TAG_BIT/2) - num_of_samples_padd;
+            int last_idx = index + shift + j*(int)(n_samples_TAG_BIT/2) - num_of_samples_padd;
             begin = in[begin_idx].real();
             begin -= average_amp;
-            end = in[end_idx].real();
-            end -= average_amp;
-            if (begin * end > 0) break;
-            float mid = in[(begin_idx + end_idx)/2].real();
+            last = in[end_idx].real();
+            last -= average_amp;
+            if (begin * last > 0) break;
+            float mid = in[(begin_idx + last_idx)/2].real();
             mid -= average_amp;
-            std::cout << "SHIFT: "<< j << " " << begin << " " << mid << " " << end << std::endl;
+            std::cout << "SHIFT: "<< j << " " << begin << " " << mid << " " << last << std::endl;
             if (begin * mid < 0) {
               shift += num_of_samples_padd/2;
               j = 0;
@@ -242,9 +242,9 @@ namespace gr
             }
           }
           begin /= abs(begin);
-          end /= abs(end);
+          last /= abs(last);
           corr += masks[mask_level][i][j] * begin;
-          corr += masks[mask_level][i][j] * end;
+          corr += masks[mask_level][i][j] * last;
           std::cout << corr << " ";
         }
         std::cout << std::endl;
