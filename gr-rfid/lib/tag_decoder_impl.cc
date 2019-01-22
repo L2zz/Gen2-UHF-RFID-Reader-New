@@ -169,8 +169,6 @@ namespace gr
       int max_max_index = -1;
       int shift = 0;
 
-      std::ofstream debug(debug_file_path, std::ios::app);
-
       for(int k=0 ; k<2 ; k++)
       {
         float max_corr = 0.0f;
@@ -183,20 +181,6 @@ namespace gr
         }
       }
 
-      if(DEBUG_MESSAGE_TAG_DECODER) std::cout << "\t\t[determine_first_mask_level] max_max_corr=" << max_max_corr;
-      debug << "\t\t[determine_first_mask_level] max_max_corr=" << max_max_corr;
-      if(max_max_index)
-      {
-        if(DEBUG_MESSAGE_TAG_DECODER) std::cout << ", high start" << std::endl;
-        debug << ", high start" << std::endl;
-      }
-      else
-      {
-        if(DEBUG_MESSAGE_TAG_DECODER) std::cout << ", low start" << std::endl;
-        debug << ", low start" << std::endl;
-      }
-
-      debug.close();
       if(max_max_index == 0) max_max_index = -1;
       return max_max_index;
     }
@@ -212,7 +196,6 @@ namespace gr
         {{-1, 1, -1, 1}, {-1, 1, 1, -1}}  // high start
       };
 
-      std::ofstream debug(debug_file_path2, std::ios::app);
       std::ofstream exe_time("time_dir/time");
 
       if(mask_level == -1) mask_level = 0;  // convert for indexing
@@ -234,7 +217,6 @@ namespace gr
 
         for (int j = 0; j < 4; j++) {
           float begin, end;
-          float corr = 0.0f;
 
           int begin_idx = index + shift + (j-1)*(int)(n_samples_TAG_BIT/2) + num_of_samples_padd;
           int end_idx = index + shift + j*(int)(n_samples_TAG_BIT/2) - num_of_samples_padd;
