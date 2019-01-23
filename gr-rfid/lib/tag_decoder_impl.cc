@@ -235,11 +235,6 @@ namespace gr
         average_amp += in[index+j].real();
       average_amp /= (2*n_samples_TAG_BIT);
 
-      float average_abs_amp = 0.0f;
-      for (int j=-(n_samples_TAG_BIT*0.5); j<(n_samples_TAG_BIT*1.5); j++)
-          average_abs_amp = abs(in[index+j].real() - average_amp);
-      average_abs_amp /= (2*n_samples_TAG_BIT);
-
       for(int i=0 ; i<2 ; i++)
       {
         float corr = 0.0f;
@@ -250,10 +245,15 @@ namespace gr
           
           start_half_bit += cut_off_samples;
           end_half_bit -= cut_off_samples;
+          
+          int pos_num = 0;
+          int neg_num = 0;
           for (int k=start_half_bit; k<end_half_bit; k++) {
-            float scaled_amp = (in[k].real() - average_amp) / average_abs_amp;
-            corr += masks[mask_level][i][j] * scaled_amp;
+            if (in[k] - average_amp > 0) pos_num++;
+            else neg_num++;
           }
+          if (masks[mask_level][i][j] > 0) corr = pos_num - neg_num;
+          else corr = neg_num - pos_num;
         }
 
         if(corr > max_corr)
