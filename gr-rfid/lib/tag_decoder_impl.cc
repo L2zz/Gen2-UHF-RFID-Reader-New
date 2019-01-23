@@ -202,6 +202,7 @@ namespace gr
     // mask_level: start level of "decoding bit", do not put start level of "previoud bit"! (-1)low start, (1)high start
     // corr: return max_corr
     {
+      std::ofstream time("time/time", std::ios::app);
       const float masks[2][2][4] = { // first, last elements are extra bits. second, third elements are real signal.
         {{1, -1, 1, -1}, {1, -1, -1, 1}}, // low start
         {{-1, 1, -1, 1}, {-1, 1, 1, -1}}  // high start
@@ -211,7 +212,9 @@ namespace gr
 
       float max_corr = 0.0f;
       int max_index = -1;
+      clock_t start, end;
 
+      start = clock();
       for(int i=0 ; i<2 ; i++)
       {
         float average_amp = 0.0f;
@@ -237,8 +240,12 @@ namespace gr
           max_index = i;
         }
       }
-
       (*ret_corr) = max_corr;
+
+      end = clock();
+      time << ((double)(end-start)/CLOCKS_PER_SEC) << std::endl;
+      time.close();
+
       return max_index;
     }
 
