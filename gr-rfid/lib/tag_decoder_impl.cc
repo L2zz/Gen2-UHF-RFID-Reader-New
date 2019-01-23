@@ -283,24 +283,26 @@ namespace gr
 
       int mask_level = determine_first_mask_level(in, index);
       int shift = 0;
+      float threshold = 0.8f;
       for(int i=0 ; i<n_expected_bit ; i++)
       {
         int idx = index + i*n_samples_TAG_BIT + shift;
         float max_corr = 0.0f;
         int max_index;
-        int curr_shift;
-
-        for(int j=0 ; j<(SHIFT_SIZE*2 + 1) ; j++)
-        {
-          float corr = 0.0f;
-          int index = decode_single_bit(in, idx+j-SHIFT_SIZE, mask_level, &corr);
-
-          if(corr > max_corr)
-          {
-            max_corr = corr;
-            max_index = index;
-            curr_shift = j - SHIFT_SIZE;
-          }
+        int curr_shift = 0;
+       
+        max_index = decode_single_bit(in, idx, mask_level, &max_corr);
+        if (max_corr < threshold) {
+            for (int j=0; j<(SHIFT_SIZE*+1); j++) {
+                float corr = 0.0f;
+                int index = decode_single_bit(in, idx+j-SHIFT_SIZE, mask_level, &corr);
+            
+                if (corr > max_corr) {
+                    max_corr = corr;
+                    max_index = index;
+                    curr_shift = j - SHIFT_SIZE;
+                }
+            }
         }
         shift += curr_shift;
 
