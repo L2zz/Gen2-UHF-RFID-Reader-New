@@ -4,5 +4,6 @@
 #sudo sysctl -w net.core.wmem_max=1048576
 #sudo GR_SCHEDULER=STS nice -n -20 
 
+rm -f debug_message
 sudo python reader.py
 rm -f why
