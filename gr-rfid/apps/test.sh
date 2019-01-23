@@ -5,5 +5,4 @@
 #sudo GR_SCHEDULER=STS nice -n -20 
 
 sudo python reader.py
-sudo python make_csv.py modi1
 rm -f why
