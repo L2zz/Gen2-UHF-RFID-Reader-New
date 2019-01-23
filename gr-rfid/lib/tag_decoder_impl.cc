@@ -105,6 +105,11 @@ namespace gr
         for(int j=0 ; j<win_size ; j++)
           average_amp += in[i+j].real();
         average_amp /= win_size;
+        
+        float average_abs_amp = 0.0f;
+        for (int j=0; j<win_size; j++)
+            average_abs_amp += abs(in[i+j].real() - average_amp);
+        average_abs_amp /= win_size;
 
         // calculate correlation value
         float corr_candidates[2] = {0.0f};
@@ -112,8 +117,10 @@ namespace gr
         {
           for(int k=0 ; k<(n_samples_TAG_BIT/2.0) ; k++)
           {
+            float scaled_amp = (in[i+j*(int)(n_samples_TAG_BIT/2)+k].real()-average_amp)\
+                               / average_abs_amp;
             for(int m=0 ; m<2 ; m++)  // m: index of TAG_PREAMBLE type
-                corr_candidates[m] += TAG_PREAMBLE[m][j] * (in[i + j*(int)(n_samples_TAG_BIT/2.0) + k].real() - average_amp);
+                corr_candidates[m] += TAG_PREAMBLE[m][j] * scaled_amp;
           }
         }
 
