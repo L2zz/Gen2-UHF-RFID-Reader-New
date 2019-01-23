@@ -293,9 +293,19 @@ namespace gr
        
         max_index = decode_single_bit(in, idx, mask_level, &max_corr);
         if (max_corr < threshold) {
-            for (int j=0; j<(SHIFT_SIZE*2+1); j++) {
+            float corr_pos = 0.0f;
+            float corr_neg = 0.0f;
+            int tendency; 
+
+            decode_single_bit(in, idx+1, mask_level, &corr_pos);
+            decode_single_bit(in, idx-1, mask_level, &corr_neg);
+
+            if (corr_pos > corr_neg) tendency = 1;
+            else tendency = -1;
+
+            for (int j=2; j<SHIFT_SIZE+1; j++) {
                 float corr = 0.0f;
-                int index = decode_single_bit(in, idx+j-SHIFT_SIZE, mask_level, &corr);
+                int index = decode_single_bit(in, idx+tendency*j, mask_level, &corr);
             
                 if (corr > max_corr) {
                     max_corr = corr;
