@@ -258,6 +258,7 @@ namespace gr
           max_index = i;
         }
       }
+      max_corr /= (2*n_samples_TAG_BIT);
       (*ret_corr) = max_corr;
 
       end = clock();
