@@ -293,7 +293,7 @@ namespace gr
        
         max_index = decode_single_bit(in, idx, mask_level, &max_corr);
         if (max_corr < threshold) {
-            for (int j=0; j<(SHIFT_SIZE*+1); j++) {
+            for (int j=0; j<(SHIFT_SIZE*2+1); j++) {
                 float corr = 0.0f;
                 int index = decode_single_bit(in, idx+j-SHIFT_SIZE, mask_level, &corr);
             
