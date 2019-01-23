@@ -34,6 +34,7 @@
 #define DEBUG_MESSAGE_TAG_DECODER_DECODE_SINGLE_BIT 0
 #define DEBUG_MESSAGE_TAG_DECODER_TAG_DETECTION 0
 #define SHIFT_SIZE 3  // used in tag_detection
+#define CUT_OFF 0.2
 
 namespace gr
 {
@@ -224,6 +225,7 @@ namespace gr
 
       float max_corr = 0.0f;
       int max_index = -1;
+      int cut_off_samples = (int)(n_samples_TAG_BIT/2) * CUT_OFF;
       clock_t start, end;
 
       start = clock();
@@ -232,24 +234,25 @@ namespace gr
         float average_amp = 0.0f;
         for(int j=-(n_samples_TAG_BIT*0.5) ; j<(n_samples_TAG_BIT*1.5) ; j++)
           average_amp += in[index+j].real();
-        average_amp /= (2*n_samples_TAG_BIT);
+        average_amp /= (int)(2*n_samples_TAG_BIT);
         
         float average_abs_amp = 0.0f;
         for (int j=-(n_samples_TAG_BIT*0.5); j<(n_samples_TAG_BIT*1.5); j++)
             average_abs_amp = abs(in[index+j].real() - average_amp);
-        average_abs_amp /= (2*n_samples_TAG_BIT);
+        average_abs_amp /= (int)(2*n_samples_TAG_BIT);
 
         float corr = 0.0f;
-        for(int j=-(n_samples_TAG_BIT*0.5) ; j<(n_samples_TAG_BIT*1.5) ; j++)
+        for(int j=0; j<4; j++)
         {
-          int idx;
-          if(j < 0) idx = 0;
-          else if(j < (n_samples_TAG_BIT*0.5)) idx = 1;
-          else if(j < n_samples_TAG_BIT) idx = 2;
-          else idx = 3;
+          int start_half_bit = index + (j-1)*(int)(n_samples_TAG_BIT/2);
+          int end_half_bit = index + j*(int)(n_samples_TAG_BIT/2);
           
-          float scaled_amp = (in[index+j].real() - average_amp) / average_abs_amp;
-          corr += masks[mask_level][i][idx] * scaled_amp;
+          start_half_bit += cut_off_samples;
+          end_half_bit -= cut_off_samples;
+          for (int k=start_half_bit; k<end_half_bit; k++) {
+            float scaled_amp = (in[k].real() - average_amp) / average_abs_amp;
+            corr += masks[mask_level][i][j] * scaled_amp;
+          }
         }
 
         if(corr > max_corr)
@@ -258,7 +261,7 @@ namespace gr
           max_index = i;
         }
       }
-      max_corr /= (2*n_samples_TAG_BIT);
+      max_corr /= (int)(2*(1-2*CUT_OFF)*n_samples_TAG_BIT);
       (*ret_corr) = max_corr;
 
       end = clock();
