@@ -233,12 +233,12 @@ namespace gr
       float average_amp = 0.0f;
       for(int j=-(n_samples_TAG_BIT*0.5) ; j<(n_samples_TAG_BIT*1.5) ; j++)
         average_amp += in[index+j].real();
-      average_amp /= (2*n_samples_TAG_BIT);
+      average_amp /= (int)(2*n_samples_TAG_BIT);
 
       float average_abs_amp = 0.0f;
       for (int j=-(n_samples_TAG_BIT*0.5); j<(n_samples_TAG_BIT*1.5); j++)
           average_abs_amp += abs(in[index+j].real() - average_amp);
-      average_abs_amp /= (2*n_samples_TAG_BIT);
+      average_abs_amp /= (int)(2*n_samples_TAG_BIT);
 
       for(int i=0 ; i<2 ; i++)
       {
@@ -262,7 +262,7 @@ namespace gr
           max_index = i;
         }
       }
-      max_corr /= (int)(2*(1-2*CUT_OFF)*n_samples_TAG_BIT);
+      max_corr /= 4*(int(n_samples_TAG_BIT/2) - 2*cut_off_samples);
       (*ret_corr) = max_corr;
 
       end = clock();
