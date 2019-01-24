@@ -297,21 +297,17 @@ namespace gr
             float corr_neg = 0.0f;
             int tendency; 
 
-            decode_single_bit(in, idx+1, mask_level, &corr_pos);
-            decode_single_bit(in, idx-1, mask_level, &corr_neg);
+            int index_pos = decode_single_bit(in, idx+SHIFT_SIZE, mask_level, &corr_pos);
+            int index_neg = decode_single_bit(in, idx-SHIFT_SIZE, mask_level, &corr_neg);
 
-            if (corr_pos > corr_neg) tendency = 1;
-            else tendency = -1;
-
-            for (int j=2; j<SHIFT_SIZE+1; j++) {
-                float corr = 0.0f;
-                int index = decode_single_bit(in, idx+tendency*j, mask_level, &corr);
-            
-                if (corr > max_corr) {
-                    max_corr = corr;
-                    max_index = index;
-                    curr_shift = j - SHIFT_SIZE;
-                }
+            if (corr_pos > corr_neg) {
+                max_corr = corr_pos;
+                max_index = index_pos;
+                curr_shift = SHIFT_SIZE;
+            } else {
+                max_corr = corr_neg;
+                max_index = index_neg;
+                curr_shift = -SHIFT_SIZE;
             }
         }
         shift += curr_shift;
