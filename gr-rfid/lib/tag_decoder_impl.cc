@@ -235,7 +235,7 @@ namespace gr
 
       float average_abs_amp = 0.0f;
       for (int j=-(n_samples_TAG_BIT*0.5); j<(n_samples_TAG_BIT*1.5); j++)
-          average_abs_amp = abs(in[index+j].real() - average_amp);
+          average_abs_amp += abs(in[index+j].real() - average_amp);
       average_abs_amp /= (2*n_samples_TAG_BIT);
 
       for(int i=0 ; i<2 ; i++)
