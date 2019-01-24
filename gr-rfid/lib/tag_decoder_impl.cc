@@ -311,14 +311,14 @@ namespace gr
         if(mask_level)
         {
           if(DEBUG_MESSAGE_TAG_DECODER_TAG_DETECTION) 
-              std::cout << " (high start)" << std::endl;
-          debug << " (high start)" << std::endl;
+              std::cout << " (high)" << std::endl;
+          debug << " (high)" << std::endl;
         }
         else
         {
           if(DEBUG_MESSAGE_TAG_DECODER_TAG_DETECTION) 
-              std::cout << " (low start)" << std::endl;
-          debug << " (low start)" << std::endl;
+              std::cout << " (low)" << std::endl;
+          debug << " (low)" << std::endl;
         }
 
         if(max_index) mask_level *= -1; // change mask_level when the decoded bit is 1
