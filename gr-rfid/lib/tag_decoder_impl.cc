@@ -323,9 +323,6 @@ namespace gr
 
         if(max_index) mask_level *= -1; // change mask_level when the decoded bit is 1
 
-        if(DEBUG_MESSAGE_TAG_DECODER_TAG_DETECTION) std::cout << std::endl << std::endl;
-        debug << std::endl << std::endl;
-
         decoded_bits.push_back(max_index);
       }
 
