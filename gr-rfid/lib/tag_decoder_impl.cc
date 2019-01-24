@@ -233,7 +233,7 @@ namespace gr
       float average_amp = 0.0f;
       for(int j=-(n_samples_TAG_BIT*0.5) ; j<(n_samples_TAG_BIT*1.5) ; j++)
         average_amp += in[index+j].real();
-      average_amp /= (2*n_samples_TAG_BIT);
+      average_amp /= (int)(2*n_samples_TAG_BIT);
 
       for(int i=0 ; i<2 ; i++)
       {
@@ -262,7 +262,7 @@ namespace gr
           max_index = i;
         }
       }
-      max_corr /= (int)(2*(1-2*CUT_OFF)*n_samples_TAG_BIT);
+      max_corr /= 4*(int(n_samples_TAG_BIT/2) - 2*cut_off_samples);
       (*ret_corr) = max_corr;
 
       end = clock();
@@ -297,21 +297,17 @@ namespace gr
             float corr_neg = 0.0f;
             int tendency; 
 
-            decode_single_bit(in, idx+1, mask_level, &corr_pos);
-            decode_single_bit(in, idx-1, mask_level, &corr_neg);
+            int index_pos = decode_single_bit(in, idx+SHIFT_SIZE, mask_level, &corr_pos);
+            int index_neg = decode_single_bit(in, idx-SHIFT_SIZE, mask_level, &corr_neg);
 
-            if (corr_pos > corr_neg) tendency = 1;
-            else tendency = -1;
-
-            for (int j=2; j<SHIFT_SIZE+1; j++) {
-                float corr = 0.0f;
-                int index = decode_single_bit(in, idx+tendency*j, mask_level, &corr);
-            
-                if (corr > max_corr) {
-                    max_corr = corr;
-                    max_index = index;
-                    curr_shift = j - SHIFT_SIZE;
-                }
+            if (corr_pos > corr_neg) {
+                max_corr = corr_pos;
+                max_index = index_pos;
+                curr_shift = SHIFT_SIZE;
+            } else {
+                max_corr = corr_neg;
+                max_index = index_neg;
+                curr_shift = -SHIFT_SIZE;
             }
         }
         shift += curr_shift;
@@ -326,20 +322,17 @@ namespace gr
         if(mask_level)
         {
           if(DEBUG_MESSAGE_TAG_DECODER_TAG_DETECTION) 
-              std::cout << " (high start)" << std::endl;
-          debug << " (high start)" << std::endl;
+              std::cout << " (high)" << std::endl;
+          debug << " (high)" << std::endl;
         }
         else
         {
           if(DEBUG_MESSAGE_TAG_DECODER_TAG_DETECTION) 
-              std::cout << " (low start)" << std::endl;
-          debug << " (low start)" << std::endl;
+              std::cout << " (low)" << std::endl;
+          debug << " (low)" << std::endl;
         }
 
         if(max_index) mask_level *= -1; // change mask_level when the decoded bit is 1
-
-        if(DEBUG_MESSAGE_TAG_DECODER_TAG_DETECTION) std::cout << std::endl << std::endl;
-        debug << std::endl << std::endl;
 
         decoded_bits.push_back(max_index);
       }
