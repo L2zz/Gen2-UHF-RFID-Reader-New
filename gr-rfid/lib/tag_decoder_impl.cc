@@ -249,7 +249,7 @@ namespace gr
           int pos_num = 0;
           int neg_num = 0;
           for (int k=start_half_bit; k<end_half_bit; k++) {
-            if (in[k] - average_amp > 0) pos_num++;
+            if (in[k].real() - average_amp > 0) pos_num++;
             else neg_num++;
           }
           if (masks[mask_level][i][j] > 0) corr = pos_num - neg_num;
