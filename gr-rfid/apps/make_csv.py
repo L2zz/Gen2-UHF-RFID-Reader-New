@@ -19,8 +19,8 @@ def get_avg(file_name):
 
 if __name__ == '__main__':
 
-    SOURCE_FILE_NAME = 'time_dir/time'
-    DEST_FILE_NAME = 'time_dir/' + sys.argv[1] + '.csv' 
+    SOURCE_FILE_NAME = 'time/time'
+    DEST_FILE_NAME = 'time/csv/' + sys.argv[1] + '.csv' 
     csv_file = open(DEST_FILE_NAME, 'a')
     csv_wr = csv.writer(csv_file, delimiter=',')
 
