@@ -14,6 +14,7 @@ def get_avg_count(file_name):
         avg += float(line)
         count += 1
     avg /= count
+    avg *= 1000000
 
     return avg, count
 
@@ -25,7 +26,7 @@ if __name__ == '__main__':
     csv_wr = csv.writer(csv_file, delimiter=',')
 
     avg, count = get_avg_count(SOURCE_FILE_NAME)
-    csv_wr.writerow([avg, count])
+    csv_wr.writerow([format(avg, '.2f'), count])
 
     csv_file.close()
 
