@@ -2,7 +2,7 @@ import sys
 import csv
 import numpy as np
 
-def get_avg(file_name):
+def get_avg_count(file_name):
     
     src = open(file_name, 'r')
 
@@ -15,7 +15,7 @@ def get_avg(file_name):
         count += 1
     avg /= count
 
-    return avg
+    return avg, count
 
 if __name__ == '__main__':
 
@@ -24,8 +24,8 @@ if __name__ == '__main__':
     csv_file = open(DEST_FILE_NAME, 'a')
     csv_wr = csv.writer(csv_file, delimiter=',')
 
-    avg = get_avg(SOURCE_FILE_NAME)
-    csv_wr.writerow([avg])
+    avg, count = get_avg_count(SOURCE_FILE_NAME)
+    csv_wr.writerow([avg, count])
 
     csv_file.close()
 
