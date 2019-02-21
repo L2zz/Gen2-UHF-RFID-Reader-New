@@ -5,5 +5,7 @@
 #sudo GR_SCHEDULER=STS nice -n -20 
 
 rm -f debug_message
+rm -f time/time
 sudo python reader.py
+sudo python make_csv.py time_count
 rm -f why

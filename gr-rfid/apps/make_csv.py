@@ -14,18 +14,19 @@ def get_avg(file_name):
         avg += float(line)
         count += 1
     avg /= count
+    avg *= 1000000
 
-    return avg
+    return avg, count
 
 if __name__ == '__main__':
 
-    SOURCE_FILE_NAME = 'time_dir/time'
-    DEST_FILE_NAME = 'time_dir/' + sys.argv[1] + '.csv' 
+    SOURCE_FILE_NAME = 'time/time'
+    DEST_FILE_NAME = 'time/csv/' + sys.argv[1] + '.csv' 
     csv_file = open(DEST_FILE_NAME, 'a')
     csv_wr = csv.writer(csv_file, delimiter=',')
 
-    avg = get_avg(SOURCE_FILE_NAME)
-    csv_wr.writerow([avg])
+    avg,count = get_avg(SOURCE_FILE_NAME)
+    csv_wr.writerow([format(avg, '.2f'), count])
 
     csv_file.close()
 

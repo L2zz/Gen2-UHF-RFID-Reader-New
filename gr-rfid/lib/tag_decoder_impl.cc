@@ -248,8 +248,6 @@ namespace gr
           int start_half_bit = index + (j-1)*(int)(n_samples_TAG_BIT/2);
           int end_half_bit = index + j*(int)(n_samples_TAG_BIT/2);
           
-          start_half_bit += cut_off_samples;
-          end_half_bit -= cut_off_samples;
           for (int k=start_half_bit; k<end_half_bit; k++) {
             float scaled_amp = (in[k].real() - average_amp) / average_abs_amp;
             corr += masks[mask_level][i][j] * scaled_amp;
@@ -262,7 +260,7 @@ namespace gr
           max_index = i;
         }
       }
-      max_corr /= 4*(int(n_samples_TAG_BIT/2) - 2*cut_off_samples);
+      max_corr /= 2*(n_samples_TAG_BIT);
       (*ret_corr) = max_corr;
 
       end = clock();
