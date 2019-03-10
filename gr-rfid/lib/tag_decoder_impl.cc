@@ -355,7 +355,7 @@ namespace gr
       int number_of_points = 0;
 
       std::ofstream debug(debug_file_path, std::ios::app);
-      std::ofstream time("time/time", std::ios::app);
+      std::ofstream time("time", std::ios::app);
       clock_t start, end;
 
       // Processing only after n_samples_to_ungate are available and we need to decode an RN16
