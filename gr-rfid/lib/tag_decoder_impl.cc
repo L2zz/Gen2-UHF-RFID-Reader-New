@@ -326,7 +326,7 @@ namespace gr
       }
 
       for (int i=0; i<n_expected_bit; i++) {
-        samples << samples_in_bit << " "; 
+        samples << samples_in_bit[i] << " "; 
       }
       samples << std::endl;
 
@@ -354,8 +354,9 @@ namespace gr
       int number_of_half_bits = 0;
       int number_of_points = 0;
 
-
       std::ofstream debug(debug_file_path, std::ios::app);
+      std::ofstream time("time/time", std::ios::app);
+      clock_t start, end;
 
       // Processing only after n_samples_to_ungate are available and we need to decode an RN16
       if(reader_state->decoder_status == DECODER_DECODE_RN16 && ninput_items[0] >= reader_state->n_samples_to_ungate)
@@ -369,8 +370,6 @@ namespace gr
         debug << "\tn_samples_to_ungate= " << reader_state->n_samples_to_ungate << ", ninput_items[0]= " << ninput_items[0] << std::endl;
 
         // detect preamble
-        std::ofstream time("time/time", std::ios::app);
-        clock_t start, end;
         start = clock();
         int RN16_index = tag_sync(in, ninput_items[0]);  //find where the tag data bits start
 
