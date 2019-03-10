@@ -33,7 +33,7 @@
 #define DEBUG_MESSAGE_TAG_DECODER 1
 #define DEBUG_MESSAGE_TAG_DECODER_DECODE_SINGLE_BIT 0
 #define DEBUG_MESSAGE_TAG_DECODER_TAG_DETECTION 0
-#define SHIFT_SIZE 3  // used in tag_detection
+#define SHIFT_SIZE 5  // used in tag_detection
 
 namespace gr
 {
@@ -202,7 +202,6 @@ namespace gr
     // mask_level: start level of "decoding bit", do not put start level of "previoud bit"! (-1)low start, (1)high start
     // corr: return max_corr
     {
-      std::ofstream time("time/time", std::ios::app);
       const float masks[2][2][4] = { // first, last elements are extra bits. second, third elements are real signal.
         {{1, -1, 1, -1}, {1, -1, -1, 1}}, // low start
         {{-1, 1, -1, 1}, {-1, 1, 1, -1}}  // high start
@@ -212,9 +211,6 @@ namespace gr
 
       float max_corr = 0.0f;
       int max_index = -1;
-      clock_t start, end;
-
-      start = clock();
       
       float average_amp = 0.0f;
       for(int j=-(n_samples_TAG_BIT*0.5) ; j<(n_samples_TAG_BIT*1.5) ; j++)
@@ -242,10 +238,6 @@ namespace gr
         }
       }
       (*ret_corr) = max_corr;
-
-      end = clock();
-      time << ((double)(end-start)/CLOCKS_PER_SEC) << std::endl;
-      time.close();
 
       return max_index;
     }
@@ -369,6 +361,9 @@ namespace gr
         debug << "\tn_samples_to_ungate= " << reader_state->n_samples_to_ungate << ", ninput_items[0]= " << ninput_items[0] << std::endl;
 
         // detect preamble
+        std::ofstream time("time/time", std::ios::app);
+        clock_t start, end;
+        start = clock();
         int RN16_index = tag_sync(in, ninput_items[0]);  //find where the tag data bits start
 
         // process for GNU RADIO
@@ -544,7 +539,13 @@ namespace gr
         consumed = reader_state->n_samples_to_ungate;
       }
       consume_each(consumed);
+
+      end = clock();
+      time << ((double)(end-start)/CLOCKS_PER_SEC) << std::endl;
+
+      time.close();
       debug.close();
+
       return WORK_CALLED_PRODUCE;
     }
 
