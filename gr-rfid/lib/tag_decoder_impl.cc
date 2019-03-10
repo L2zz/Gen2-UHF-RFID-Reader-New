@@ -245,7 +245,9 @@ namespace gr
     std::vector<float> tag_decoder_impl::tag_detection(const gr_complex* in, int index, int n_expected_bit)
     {
       std::vector<float> decoded_bits;
-
+      std::vector<int> samples_in_bit;
+      
+      std::ofstream samples("samples", std::ios::app);
       std::ofstream debug(debug_file_path, std::ios::app);
 
       if(DEBUG_MESSAGE_TAG_DECODER) std::cout << "\t[tag_decoder::tag_detection] Decoding " << n_expected_bit << " bit(s) of tag data.." << std::endl;
@@ -255,7 +257,7 @@ namespace gr
       int shift = 0;
       for(int i=0 ; i<n_expected_bit ; i++)
       {
-        int idx = index + i*n_samples_TAG_BIT + shift;
+        int idx = index + i*(int)n_samples_TAG_BIT + shift;
         float max_corr = 0.0f;
         int max_index;
         int curr_shift;
@@ -298,7 +300,8 @@ namespace gr
 
         if(DEBUG_MESSAGE_TAG_DECODER_TAG_DETECTION) std::cout << std::endl << std::endl;
         debug << std::endl << std::endl;
-
+        
+        samples_in_bit.push_back((int)n_samples_TAG_BIT + curr_shift);
         decoded_bits.push_back(max_index);
       }
 
@@ -321,6 +324,11 @@ namespace gr
           debug << std::endl << "\t\t\t\t\t";
         }
       }
+
+      for (int i=0; i<n_expected_bit; i++) {
+        samples << samples_in_bit << " "; 
+      }
+      samples << std::endl;
 
       if(DEBUG_MESSAGE_TAG_DECODER) std::cout << std::endl;
       debug << std::endl;
