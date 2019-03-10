@@ -1,4 +1,3 @@
-import sys
 import csv
 import numpy as np
 
@@ -16,17 +15,17 @@ def get_avg_count(file_name):
     avg /= count
     avg *= 1000000
 
-    return avg, count
+    return avg
 
 if __name__ == '__main__':
 
-    SOURCE_FILE_NAME = 'time/time'
-    DEST_FILE_NAME = 'time/csv/' + sys.argv[1] + '.csv' 
+    SOURCE_FILE_NAME = 'time'
+    DEST_FILE_NAME = 'time.csv' 
     csv_file = open(DEST_FILE_NAME, 'a')
     csv_wr = csv.writer(csv_file, delimiter=',')
 
-    avg, count = get_avg_count(SOURCE_FILE_NAME)
-    csv_wr.writerow([format(avg, '.2f'), count])
+    avg = get_avg_count(SOURCE_FILE_NAME)
+    csv_wr.writerow([format(avg, '.2f')])
 
     csv_file.close()
 

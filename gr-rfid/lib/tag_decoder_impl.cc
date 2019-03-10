@@ -357,7 +357,8 @@ namespace gr
       std::ofstream debug(debug_file_path, std::ios::app);
       std::ofstream time("time", std::ios::app);
       clock_t start, end;
-
+  
+      start = clock();
       // Processing only after n_samples_to_ungate are available and we need to decode an RN16
       if(reader_state->decoder_status == DECODER_DECODE_RN16 && ninput_items[0] >= reader_state->n_samples_to_ungate)
       {
@@ -370,7 +371,6 @@ namespace gr
         debug << "\tn_samples_to_ungate= " << reader_state->n_samples_to_ungate << ", ninput_items[0]= " << ninput_items[0] << std::endl;
 
         // detect preamble
-        start = clock();
         int RN16_index = tag_sync(in, ninput_items[0]);  //find where the tag data bits start
 
         // process for GNU RADIO
