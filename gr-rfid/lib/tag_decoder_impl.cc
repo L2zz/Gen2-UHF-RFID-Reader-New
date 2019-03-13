@@ -262,16 +262,16 @@ namespace gr
         int max_index;
         int curr_shift;
 
-        for(int j=0 ; j<(SHIFT_SIZE*2 + 1) ; j++)
+        for(int j=0 ; j<(SHIFT_SIZE + 1) ; j++)
         {
           float corr = 0.0f;
-          int index = decode_single_bit(in, idx+j-SHIFT_SIZE, mask_level, &corr);
+          int index = decode_single_bit(in, idx+j, mask_level, &corr);
 
           if(corr > max_corr)
           {
             max_corr = corr;
             max_index = index;
-            curr_shift = j - SHIFT_SIZE;
+            curr_shift = j;
           }
         }
         shift += curr_shift;
