@@ -25,7 +25,7 @@ if __name__ == '__main__':
     csv_file = open(DEST_FILE_NAME, 'a')
     csv_wr = csv.writer(csv_file, delimiter=',')
 
-    avg = get_avg_count(SOURCE_FILE_NAME)
+    avg = get_avg(SOURCE_FILE_NAME)
     csv_wr.writerow([format(avg, '.2f')])
 
     csv_file.close()
