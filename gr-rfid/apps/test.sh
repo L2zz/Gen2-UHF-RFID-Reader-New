@@ -5,7 +5,7 @@
 #sudo GR_SCHEDULER=STS nice -n -20 
 
 
-rm -f debug_message time corrs samples # Remove past data 
+rm -f debug_message result/time result/corrs result/samples # Remove past data 
 
 sudo python reader.py
 rm -f why

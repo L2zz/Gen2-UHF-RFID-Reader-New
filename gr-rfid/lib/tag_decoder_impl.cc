@@ -248,8 +248,8 @@ namespace gr
       std::vector<float> correlations;
       std::vector<int> samples_in_bit;
       
-      std::ofstream samples("samples", std::ios::app);
-      std::ofstream corrs("corrs", std::ios::app);
+      std::ofstream samples("result/samples", std::ios::app);
+      std::ofstream corrs("result/corrs", std::ios::app);
       std::ofstream debug(debug_file_path, std::ios::app);
 
       if(DEBUG_MESSAGE_TAG_DECODER) std::cout << "\t[tag_decoder::tag_detection] Decoding " << n_expected_bit << " bit(s) of tag data.." << std::endl;
@@ -360,7 +360,7 @@ namespace gr
       int number_of_points = 0;
 
       std::ofstream debug(debug_file_path, std::ios::app);
-      std::ofstream time("time", std::ios::app);
+      std::ofstream time("result/time", std::ios::app);
       clock_t start, end;
   
       start = clock();
