@@ -1,7 +1,8 @@
 import csv
+import sys
 import numpy as np
 
-def get_avg_count(file_name):
+def get_avg(file_name):
     
     src = open(file_name, 'r')
 
@@ -19,8 +20,8 @@ def get_avg_count(file_name):
 
 if __name__ == '__main__':
 
-    SOURCE_FILE_NAME = 'time'
-    DEST_FILE_NAME = 'time.csv' 
+    SOURCE_FILE_NAME = sys.argv[1]
+    DEST_FILE_NAME = sys.argv[1] + '.csv' 
     csv_file = open(DEST_FILE_NAME, 'a')
     csv_wr = csv.writer(csv_file, delimiter=',')
 

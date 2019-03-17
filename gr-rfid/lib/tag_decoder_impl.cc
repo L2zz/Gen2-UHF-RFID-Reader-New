@@ -33,7 +33,7 @@
 #define DEBUG_MESSAGE_TAG_DECODER 1
 #define DEBUG_MESSAGE_TAG_DECODER_DECODE_SINGLE_BIT 0
 #define DEBUG_MESSAGE_TAG_DECODER_TAG_DETECTION 0
-#define SHIFT_SIZE 5  // used in tag_detection
+#define SHIFT_SIZE 0  // used in tag_detection
 
 namespace gr
 {
@@ -245,9 +245,11 @@ namespace gr
     std::vector<float> tag_decoder_impl::tag_detection(const gr_complex* in, int index, int n_expected_bit)
     {
       std::vector<float> decoded_bits;
+      std::vector<float> correlations;
       std::vector<int> samples_in_bit;
       
       std::ofstream samples("samples", std::ios::app);
+      std::ofstream corrs("corrs", std::ios::app);
       std::ofstream debug(debug_file_path, std::ios::app);
 
       if(DEBUG_MESSAGE_TAG_DECODER) std::cout << "\t[tag_decoder::tag_detection] Decoding " << n_expected_bit << " bit(s) of tag data.." << std::endl;
@@ -302,6 +304,7 @@ namespace gr
         debug << std::endl << std::endl;
         
         samples_in_bit.push_back((int)n_samples_TAG_BIT + curr_shift);
+        correlations.push_back(max_corr);
         decoded_bits.push_back(max_index);
       }
 
@@ -327,8 +330,10 @@ namespace gr
 
       for (int i=0; i<n_expected_bit; i++) {
         samples << samples_in_bit[i] << " "; 
+        corrs << correlations[i] << " ";
       }
       samples << std::endl;
+      corrs << std::endl;
 
       if(DEBUG_MESSAGE_TAG_DECODER) std::cout << std::endl;
       debug << std::endl;

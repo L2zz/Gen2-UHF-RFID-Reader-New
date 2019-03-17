@@ -2,21 +2,21 @@ import sys
 import csv
 import numpy as np
 
-def get_samples(file_name):
+def get_value_from_epc(file_name):
 
     src = open(file_name, 'r')
     
-    samples= []
+    values= []
     while True:
         rn16_line = src.readline()
         if not rn16_line: break
         
         epc_line = src.readline()
-        samples_in_epc = epc_line.split(' ')
-        samples_in_epc.pop()
-        samples.append(samples_in_epc)
+        value_in_epc = epc_line.split(' ')
+        value_in_epc.pop()
+        values.append(value_in_epc)
 
-    return samples
+    return values
 
 if __name__ == '__main__':
     SOURCE_FILE_NAME = sys.argv[1]
@@ -24,9 +24,9 @@ if __name__ == '__main__':
     csv_file = open(DEST_FILE_NAME, 'w')
     csv_wr = csv.writer(csv_file, delimiter=',')
 
-    samples = get_samples(SOURCE_FILE_NAME)
+    values = get_value_from_epc(SOURCE_FILE_NAME)
 
-    for epc_samples in samples:
-        csv_wr.writerow(epc_samples)
+    for val in values:
+        csv_wr.writerow(val)
 
     csv_file.close()

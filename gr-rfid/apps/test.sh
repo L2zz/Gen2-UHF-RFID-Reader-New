@@ -4,9 +4,8 @@
 #sudo sysctl -w net.core.wmem_max=1048576
 #sudo GR_SCHEDULER=STS nice -n -20 
 
-rm -f debug_message
-rm -f time
-rm -f samples
+
+rm -f debug_message time corrs samples # Remove past data 
+
 sudo python reader.py
-sudo python make_csv.py
 rm -f why
