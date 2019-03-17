@@ -1,7 +1,5 @@
 gr-rfid/build/
 gr-rfid/misc/
 
-gr-rfid/apps/time
-gr-rfid/apps/corrs
-gr-rfid/apps/samples
+gr-rfid/apps/result
 gr-rfid/apps/debug_message
