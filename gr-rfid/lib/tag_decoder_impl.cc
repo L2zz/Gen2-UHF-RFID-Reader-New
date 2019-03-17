@@ -33,7 +33,7 @@
 #define DEBUG_MESSAGE_TAG_DECODER 1
 #define DEBUG_MESSAGE_TAG_DECODER_DECODE_SINGLE_BIT 0
 #define DEBUG_MESSAGE_TAG_DECODER_TAG_DETECTION 0
-#define SHIFT_SIZE 3  // used in tag_detection
+#define SHIFT_SIZE 0  // used in tag_detection
 
 namespace gr
 {
