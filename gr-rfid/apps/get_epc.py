@@ -21,7 +21,7 @@ def get_value_from_epc(file_name):
 if __name__ == '__main__':
     SOURCE_FILE_NAME = sys.argv[1]
     DEST_FILE_NAME = sys.argv[1] + '.csv'
-    csv_file = open(DEST_FILE_NAME, 'w')
+    csv_file = open(DEST_FILE_NAME, 'a')
     csv_wr = csv.writer(csv_file, delimiter=',')
 
     values = get_value_from_epc(SOURCE_FILE_NAME)
