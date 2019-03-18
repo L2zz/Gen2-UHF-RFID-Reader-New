@@ -247,9 +247,11 @@ namespace gr
       std::vector<float> decoded_bits;
       std::vector<float> correlations;
       std::vector<int> samples_in_bit;
+      std::vector<int> shifts_vec;
       
       std::ofstream samples("result/samples", std::ios::app);
       std::ofstream corrs("result/corrs", std::ios::app);
+      std::ofstream shifts("result/shifts", std::ios::app);
       std::ofstream debug(debug_file_path, std::ios::app);
 
       if(DEBUG_MESSAGE_TAG_DECODER) std::cout << "\t[tag_decoder::tag_detection] Decoding " << n_expected_bit << " bit(s) of tag data.." << std::endl;
@@ -306,6 +308,7 @@ namespace gr
         samples_in_bit.push_back((int)n_samples_TAG_BIT + curr_shift);
         correlations.push_back(max_corr);
         decoded_bits.push_back(max_index);
+        shifts_vec.push_back(shift);
       }
 
       if(DEBUG_MESSAGE_TAG_DECODER) std::cout << "\t[tag_detection] decoded_bits=\t";
@@ -331,13 +334,18 @@ namespace gr
       for (int i=0; i<n_expected_bit; i++) {
         samples << samples_in_bit[i] << " "; 
         corrs << correlations[i] << " ";
+        shifts << shifts_vec[i] << " ";
       }
       samples << std::endl;
       corrs << std::endl;
+      shifts << std::endl;
 
       if(DEBUG_MESSAGE_TAG_DECODER) std::cout << std::endl;
       debug << std::endl;
 
+      samples.close();
+      corrs.close();
+      shifts.close();
       debug.close();
       return decoded_bits;
     }
