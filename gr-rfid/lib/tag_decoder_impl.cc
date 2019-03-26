@@ -26,6 +26,7 @@
 #include <gnuradio/prefs.h>
 #include <gnuradio/math.h>
 #include <cmath>
+#include <cstdlib>
 #include <time.h>
 #include <sys/time.h>
 #include "tag_decoder_impl.h"
@@ -33,7 +34,7 @@
 #define DEBUG_MESSAGE_TAG_DECODER 1
 #define DEBUG_MESSAGE_TAG_DECODER_DECODE_SINGLE_BIT 0
 #define DEBUG_MESSAGE_TAG_DECODER_TAG_DETECTION 0
-#define SHIFT_SIZE 3  // used in tag_detection
+#define SHIFT_SIZE 0  // used in tag_detection
 
 namespace gr
 {
@@ -252,16 +253,32 @@ namespace gr
       std::ofstream samples("result/samples", std::ios::app);
       std::ofstream corrs("result/corrs", std::ios::app);
       std::ofstream shifts("result/shifts", std::ios::app);
+      std::ofstream pres("result/presize", std::ios::app);
       std::ofstream debug(debug_file_path, std::ios::app);
 
       if(DEBUG_MESSAGE_TAG_DECODER) std::cout << "\t[tag_decoder::tag_detection] Decoding " << n_expected_bit << " bit(s) of tag data.." << std::endl;
       debug << "\t[tag_decoder::tag_detection] Decoding " << n_expected_bit << " bit(s) of tag data.." << std::endl;
 
+      // Calculate length of one bit from full length of signal
+      int expected_end = n_samples_TAG_BIT*n_expected_bit;
+      int end_idx = expected_end;
+      float prev_amp, cur_amp;
+      for (int i=0; i<n_samples_TAG_BIT; i++) {
+        prev_amp = in[expected_end-(int)(0.05*n_samples_TAG_BIT)+i].real();
+        cur_amp = in[expected_end+i].real();
+        if (abs(cur_amp - prev_amp) > 0.1*cur_amp) {
+            end_idx = expected_end+i;
+        }
+      }
+
+      float presize_samples = (float)end_idx/n_expected_bit;
+      pres << presize_samples << " " << std::endl;
+
       int mask_level = determine_first_mask_level(in, index);
       int shift = 0;
       for(int i=0 ; i<n_expected_bit ; i++)
       {
-        int idx = index + i*(int)n_samples_TAG_BIT + shift;
+        int idx = index + i*presize_samples + shift;
         float max_corr = 0.0f;
         int max_index;
         int curr_shift;
@@ -346,6 +363,7 @@ namespace gr
       samples.close();
       corrs.close();
       shifts.close();
+      pres.close();
       debug.close();
       return decoded_bits;
     }
@@ -369,6 +387,7 @@ namespace gr
 
       std::ofstream debug(debug_file_path, std::ios::app);
       std::ofstream time("result/time", std::ios::app);
+      std::ofstream data("result/data", std::ios::app);
       clock_t start, end;
   
       start = clock();
@@ -382,6 +401,11 @@ namespace gr
         }
         debug << "[tag_decoder] Ready to decode RN16.." << std::endl;
         debug << "\tn_samples_to_ungate= " << reader_state->n_samples_to_ungate << ", ninput_items[0]= " << ninput_items[0] << std::endl;
+        
+        for (int i=0; i<ninput_items[0]; i++) {
+            data << in[i].real() << " ";
+        }
+        data << std::endl;
 
         // detect preamble
         int RN16_index = tag_sync(in, ninput_items[0]);  //find where the tag data bits start
@@ -454,6 +478,11 @@ namespace gr
         }
         debug << "[tag_decoder] Ready to decode EPC.." << std::endl;
         debug << "\tn_samples_to_ungate= " << reader_state->n_samples_to_ungate << ", ninput_items[0]= " << ninput_items[0] << std::endl;
+        
+        for (int i=0; i<ninput_items[0]; i++) {
+            data << in[i].real() << " ";
+        }
+        data << std::endl;
 
         // detect preamble
         int EPC_index = tag_sync(in, ninput_items[0]);
@@ -564,6 +593,7 @@ namespace gr
       time << ((double)(end-start)/CLOCKS_PER_SEC) << std::endl;
 
       time.close();
+      data.close();
       debug.close();
 
       return WORK_CALLED_PRODUCE;
